@@ -1,3 +1,6 @@
+var test = document.getElementById('addToCart');
+console.log(test);
+
 //récupération des parmètres de l'URL
 const urlSearch = window.location.search;
 const urlParams = new URLSearchParams(urlSearch);
@@ -47,6 +50,7 @@ async function displayProduct(){
 //appel de la fonction d'affichage du produit
 displayProduct();
 
+
 //gestion de l'ajout au panier
 document.querySelector('#addToCart').addEventListener('click', () => {
     //récupération de la couleur et la quantité séléctionnées par l'utilisateur
@@ -69,5 +73,24 @@ document.querySelector('#addToCart').addEventListener('click', () => {
 
 //création de la fonction d'ajout au panier
 function addToCart(){
-    
+    //récupération du panier depuis le localStorage
+    const cart = localStorage.getItem('cart') != null ||
+    localStorage.getItem('cart') != undefined ? JSON.parse(localStorage.getItem('cart')) : [];
+
+    //récupération des données saisies par l'utilisateur
+    const color = document.querySelector('#colors').value;
+    const quantity = parseInt(document.querySelector('#quantity').value);
+    const name = document.querySelector('#title').textContent;
+    const image = document.querySelector('.item__img').innerHTML;
+    const productPicked = {
+        id: productId, color, image, name, quantity,
+    };
+
+    //ajout du produit si le panier est vide
+    if (cart.length <= 0){
+        cart.push(productPicked);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert('Produit ajouté au panier');
+        return
+    };
 }
