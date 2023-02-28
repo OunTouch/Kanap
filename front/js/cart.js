@@ -1,3 +1,4 @@
+
 //récupération de la string "cart" depuis le localStorage sous forme d'objet
 let productInLocalStorage = JSON.parse(localStorage.getItem('cart'));
 
@@ -99,68 +100,56 @@ function totalArticles(){
 }
 
 //création de la fonction de mise à jour de la quantité de produits
-
-function updateQuantity(datas){
-  let itemQuantity = document.querySelectorAll('itemQuantity');
-  for (let i = 0; i < itemQuantity.length; i++){
-    //ajout d'un gestionnaire d'évènement de type "change"
-    itemQuantity[i].addEventListener('change', (event) =>{
-      //empêche le comportement par défaut de l'agent utilisateur
+function updateQuantity(datas) {
+  let itemQuantity = document.querySelectorAll('.itemQuantity');
+  for (let i = 0; i < itemQuantity.length; i++) {
+    // ajout d'un gestionnaire d'événement "change" à l'élément "itemQuantity"
+    itemQuantity[i].addEventListener('change', (event) => {
+      // empêche le comportement par défaut (rechargement de la page)
       event.preventDefault();
-      //récupération de la quantité et création d'un objet avec les nouveaux produits
-      let newItemQuantity = itemQuantity[i].value;
+      // récupèration de la nouvelle quantité entrée par l'utilisateur
+      let itemWithNewQuantity = itemQuantity[i].value;
+      // création un nouvel objet avec les nouvelles données du produit (ID, quantité, etc.)
       const newLocalStorage = {
         id: productInLocalStorage[i].id,
         image: productInLocalStorage[i].image,
         alt: productInLocalStorage[i].alt,
         name: productInLocalStorage[i].name,
         color: productInLocalStorage[i].color,
-        quantity: parseInt(newItemQuantity),
+        quantity: parseInt(itemWithNewQuantity),
       };
-      //message d'erreur si erreur de quantité
-      if(newItemQuantity > 100 || newItemQuantity <= 0){
-        alert('Veuillez renseigner une quantité valide');
-        return
+      // si la quantité est supérieure à 100 ou inférieure ou égale à 0, affiche un message d'erreur
+      if (itemWithNewQuantity > 100 || itemWithNewQuantity <= 0) {
+        alert('Veuillez renseigner une quantité entre 1 et 100');
+        return;
       }
-      //stockage dans le localStorage
+      // stockage des valeurs dans le localstorage
       productInLocalStorage[i] = newLocalStorage;
       localStorage.setItem('cart', JSON.stringify(productInLocalStorage));
-      //appel aux fonctions de nombre d'articles et de prix
       totalArticles();
       getAllPrices(datas);
-    })
+    });
   }
 }
 
 //création de la fonction de calcul du prix
 function getAllPrices(datas) {
   // Utiliser reduce pour réduire productInLocalStorage en une seule valeur
-  console.log(productInLocalStorage);
   const result = productInLocalStorage.reduce(
-    (acc, currentValue) => {
-      const index = datas.findIndex(
-        (product) => product._id === currentValue.id
-      );
+    (accumulator, currentValue) => {
+      const index = datas.findIndex((product) => product._id === currentValue.id);
       // Accumuler la quantité et le prix du produit courant
-      acc.nbProduct += parseInt(currentValue.quantity);
-      acc.totalPrice += parseInt(currentValue.quantity * datas[index].price);
-      
-      console.log(index);
-      console.log(acc);
- 
-      return acc;
+      accumulator.totalPrice += parseInt(currentValue.quantity * datas[index].price, 10);
+      return accumulator;
     },
-    
-    { nbProduct: 0, totalPrice: 0 }
-  ); // Valeur initiale de l'accumulateur
-  console.log(result);
+    // Valeur initiale de l'accumulateur
+    { totalPrice: 0 }
+  ); 
   // Affiche le nombre total de produits et le prix total
-
   document.querySelector('#totalPrice').textContent = result.totalPrice;
 }
 
 //création du formulaire
-
 //récupération des champs HTML à remplir
 const firstName = document.querySelector('#firstName');
 const lastName = document.querySelector('#lastName');
@@ -188,14 +177,17 @@ function firstNameValid(){
     //si le champ firstname n'est pas rempli
     if (firstNameValue === ''){
       firstNameMessage.textContent= 'Veuillez renseigner ce champ';
+      return false;
     }
     //si la valeur du champ firstname ne correspond pas au motif de caractères alphabétques et d'espaces
     else if (!firstNameValue.match(/^[a-zA-Z-\s]+$/)){
       firstNameMessage.textContent= 'Ne doit pas contenir de chiffres';
+      return false;
     }
     //si aucune erreur n'est détectée
     else{
       firstNameMessage.textContent='';
+      return true;
     }
 }
 
@@ -206,11 +198,14 @@ function lastNameValid(){
 
   if(lastNameValue === ''){
     lastNameMessage.textContent = 'Veuillez renseigner ce champ';
+    return false;
   }
   else if (!lastNameValue.match(/^[a-zA-Z-\s]+$/)){
     lastNameMessage.textContent = 'Ne doit pas contenir de chiffres';
+    return false;
   } else {
     lastNameMessage.textContent = '';
+    return true;
   }
 }
 
@@ -220,8 +215,10 @@ function addressValid(){
   const addressNameValue = address.value.trim();
   if (addressNameValue === ''){
     addressNameMessage.textContent = 'Veuillez renseigner ce champ';
+    return false;
   } else {
     addressNameMessage.textContent = '';
+    return true;
   }
 }
 
@@ -230,9 +227,11 @@ function cityValid(){
   let cityNameMessage =document.querySelector('#cityErrorMsg');
   const cityNameValue = city.value.trim();
   if (cityNameValue === ''){
-    cityNameMessage.textContent = 'Veuillez renseigner ce champ'
+    cityNameMessage.textContent = 'Veuillez renseigner ce champ';
+    return false;
   } else {
     cityNameMessage.textContent = '';
+    return true;
   }
 }
 
@@ -245,9 +244,11 @@ function emailValid(){
   } else
   //vérification de la conformité de l'adresse email grâce à une expression régulière 
   if (!emailValue.match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)){
-    emailMessage.textContent = 'Veuillez renseigner un email valide'
+    emailMessage.textContent = 'Veuillez renseigner un email valide';
+    return false;
   } else {
     emailMessage.textContent = '';
+    return true;
   }
 }
 
@@ -281,7 +282,11 @@ sendOrder.addEventListener('click', function (e){
   };
   //vérifications que les informations saisies sont exactes
   if (
-    firstNameValid && lastNameValid && addressValid && cityValid && emailValid
+    firstNameValid() &&
+    lastNameValid() &&
+    addressValid() &&
+    cityValid() &&
+    emailValid()
   ){
     //appel à la fonction d'envoi de la commande au serveur
     orderProduct(order);
@@ -310,7 +315,7 @@ function orderProduct(order) {
   .then(function (value) {
     window.location = `./confirmation.html?orderId=${value.orderId}`;
     //effacement du localStorage
-    localStorage.clear
+    localStorage.clear();
   })
   //gestion d'une erreur lors de l'appel à l'API
   .catch(function (err){
