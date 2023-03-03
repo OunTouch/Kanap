@@ -28,7 +28,6 @@ function showCart(datas){
     for (let data of productInLocalStorage){
         //récupération de l'index du produit dans l'array datas
         const index = datas.findIndex((product) => product._id === data.id);
-        console.log(index);
         //affichage HTML
         const product = `<article class="cart__item" data-id="${data.id}" data-color="${data.color}">
         <div class="cart__item__img">
@@ -145,7 +144,7 @@ function getAllPrices(datas) {
     // Valeur initiale de l'accumulateur
     { totalPrice: 0 }
   ); 
-  // Affiche le nombre total de produits et le prix total
+  // Affiche le prix total
   document.querySelector('#totalPrice').textContent = result.totalPrice;
 }
 
